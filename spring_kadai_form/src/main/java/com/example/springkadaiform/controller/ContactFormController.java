@@ -5,6 +5,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.springkadaiform.form.ContactForm;
 
@@ -21,16 +22,34 @@ public class ContactFormController {
 		return "contactFormView";
 	}
 	
+	@GetMapping("/confirm")
+	public String confirmView() {
+		return "confirmView";
+	}
+	
 	@PostMapping("/form")
 	public String confirm(
 			@Valid ContactForm contactForm,
 			BindingResult bindingResult,
-			Model model
+			RedirectAttributes redirectAttributes
 			) {
 		if (bindingResult.hasErrors()) {
-			return "contactFormView";
+			
+			redirectAttributes.addFlashAttribute(
+					"contactForm",
+					contactForm
+			);
+			
+			redirectAttributes.addFlashAttribute(
+					BindingResult.MODEL_KEY_PREFIX + "contactForm",
+					bindingResult
+			);
+			
+			return "redirect:/contact";
 		}
-		model.addAttribute("contactForm", contactForm);
-		return "confirmView";
+		
+		redirectAttributes.addFlashAttribute("contactForm", contactForm);
+		
+		return "redirect:/confirm";
 	}
 }
